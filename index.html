@@ -3,223 +3,175 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Web3 Игры и Подарки</title>
+  <title>Web3 Games</title>
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #f0f0f0;
-      height: 100vh;
-      overflow: hidden;
+    :root {
+      --primary-color: #007AFF;
+      --bg-color: #f5f5f5;
+      --text-color: #333;
     }
 
-    /* Экран загрузки */
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+    }
+
     .loading-screen {
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       height: 100vh;
-      background-color: #1a1a1a;
-      color: #fff;
-      transition: opacity 0.5s ease;
+      background: #1a1a1a;
+      color: white;
+      transition: opacity 0.3s;
     }
 
-    .gift-box {
+    .loader {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #fff;
+      border-radius: 50%;
+      border-top-color: transparent;
+      animation: spin 1s linear infinite;
+    }
+
+    .main-content {
+      padding: 20px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .profile-card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .avatar {
       width: 100px;
       height: 100px;
-      background: url('https://via.placeholder.com/100?text=🎁') no-repeat center;
-      animation: bounce 1.5s infinite;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 16px;
+      border: 3px solid var(--primary-color);
     }
 
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-20px); }
+    .menu-button {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      margin: 8px 0;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+
+    .menu-button:active {
+      transform: scale(0.98);
+      opacity: 0.9;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
 
     .hidden { display: none; }
-
-    /* Главная страница */
-    .main-page {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-
-    .content { 
-      flex-grow: 1;
-      padding: 20px;
-      overflow-y: auto;
-    }
-
-    .bottom-menu {
-      display: flex;
-      justify-content: space-around;
-      padding: 10px;
-      background-color: #fff;
-      border-top: 1px solid #ccc;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-    }
-
-    .bottom-menu button {
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #007aff;
-      color: #fff;
-      border: none;
-      border-radius: 25px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      min-width: 120px;
-    }
-
-    .bottom-menu button:hover { 
-      background-color: #005bb5;
-      transform: translateY(-2px);
-    }
-
-    /* Стили профиля */
-    .profile-info {
-      padding: 25px;
-      background: #ffffff;
-      text-align: center;
-      border-bottom: 1px solid #eee;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    }
-
-    .profile-info img {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      margin-bottom: 15px;
-      object-fit: cover;
-      border: 3px solid #007aff;
-    }
-
-    .profile-info h3 {
-      margin: 0 0 5px 0;
-      font-size: 1.3em;
-      color: #1a1a1a;
-    }
-
-    .profile-info p {
-      margin: 0;
-      color: #666;
-      font-size: 0.95em;
-    }
-
-    /* Адаптивность */
-    @media (max-width: 480px) {
-      .bottom-menu button {
-        padding: 8px 15px;
-        font-size: 14px;
-        min-width: 100px;
-      }
-      
-      .profile-info {
-        padding: 15px;
-      }
-    }
   </style>
 </head>
 <body>
-  <!-- Экран загрузки -->
-  <div id="loading-screen" class="loading-screen">
-    <div class="gift-box"></div>
-    <p>Открываем подарки...</p>
+  <div id="loading" class="loading-screen">
+    <div class="loader"></div>
+    <p>Загрузка приложения...</p>
   </div>
 
-  <!-- Главная страница -->
-  <div id="main-page" class="main-page hidden">
-    <div id="profile-info" class="profile-info hidden"></div>
-    <div class="content">
-      <h2 style="color: #333; text-align: center;">Добро пожаловать!</h2>
-    </div>
-    <div class="bottom-menu">
-      <button id="contests-btn">Конкурсы</button>
-      <button id="profile-btn">Профиль</button>
+  <div id="app" class="hidden">
+    <div class="main-content">
+      <div id="profile" class="profile-card hidden">
+        <img id="avatar" class="avatar" alt="Аватар">
+        <h2 id="username"></h2>
+        <p id="userid"></p>
+      </div>
+
+      <button id="gamesBtn" class="menu-button">🎮 Игры</button>
+      <button id="giftsBtn" class="menu-button">🎁 Мои подарки</button>
+      <button id="profileBtn" class="menu-button">👤 Профиль</button>
     </div>
   </div>
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
-    // Проверка загрузки Telegram Web App SDK
-    if (!window.Telegram) {
-      console.error('Telegram Web App SDK не загружен!');
-      // Fallback для тестирования вне Telegram
-      window.Telegram = {
-        WebApp: {
-          ready: () => {},
-          expand: () => {},
-          initDataUnsafe: {
-            user: {
-              id: 12345,
-              first_name: "Тестовый",
-              username: "test_user",
-              photo_url: "https://via.placeholder.com/80"
-            }
-          }
-        }
-      };
-    }
+    // Инициализация Telegram Web App
+    const tg = window.Telegram?.WebApp;
+    const loadingScreen = document.getElementById('loading');
+    const appContainer = document.getElementById('app');
 
-    const tg = window.Telegram.WebApp;
-    const loadingScreen = document.getElementById('loading-screen');
-    const mainPage = document.getElementById('main-page');
-    const profileInfo = document.getElementById('profile-info');
-    const profileBtn = document.getElementById('profile-btn');
-    const contestsBtn = document.getElementById('contests-btn');
+    // Элементы профиля
+    const profileCard = document.getElementById('profile');
+    const avatar = document.getElementById('avatar');
+    const username = document.getElementById('username');
+    const userid = document.getElementById('userid');
 
     // Инициализация приложения
-    tg.ready();
-    tg.expand();
+    function initApp() {
+      if (tg) {
+        tg.ready();
+        tg.expand();
+        tg.enableClosingConfirmation();
+        
+        // Показываем данные пользователя
+        const user = tg.initDataUnsafe?.user;
+        if (user) {
+          profileCard.classList.remove('hidden');
+          avatar.src = user.photo_url || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+          username.textContent = user.first_name || user.username || 'Гость';
+          userid.textContent = user.id ? `ID: ${user.id}` : '';
+        }
+      } else {
+        // Режим разработки
+        profileCard.classList.remove('hidden');
+        avatar.src = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+        username.textContent = 'Режим разработки';
+        console.warn('Telegram Web App не обнаружен');
+      }
 
-    // Функция показа профиля
-    function showProfile() {
-      const user = tg.initDataUnsafe.user || {};
-      const fallbackAvatar = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
-      
-      const profileHTML = `
-        <img src="${user.photo_url || fallbackAvatar}" 
-             onerror="this.onerror=null;this.src='${fallbackAvatar}'"
-             alt="Аватар">
-        <h3>${user.first_name || user.username || 'Гость'}</h3>
-        ${user.username ? `<p>@${user.username}</p>` : ''}
-      `;
-
-      profileInfo.innerHTML = profileHTML;
-      profileInfo.classList.remove('hidden');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    // Обработчики событий
-    profileBtn.addEventListener('click', showProfile);
-    contestsBtn.addEventListener('click', () => {
-      profileInfo.classList.add('hidden');
-      // Дополнительная логика для конкурсов
-    });
-
-    // Имитация загрузки
-    setTimeout(() => {
+      // Скрываем экран загрузки
       loadingScreen.style.opacity = '0';
       setTimeout(() => {
         loadingScreen.classList.add('hidden');
-        mainPage.classList.remove('hidden');
-        
-        // Автоматический показ профиля при наличии данных
-        if (tg.initDataUnsafe.user) {
-          showProfile();
-        }
-      }, 500);
-    }, 2000);
+        appContainer.classList.remove('hidden');
+      }, 300);
+    }
 
-    // Фолбэк для тестирования
-    if (window.location.search.includes('test')) {
-      window.Telegram.WebApp.initDataUnsafe.user = {
-        first_name: "Тестовый",
-        username: "test_user",
-        photo_url: "https://via.placeholder.com/80"
-      };
+    // Обработчики событий
+    document.getElementById('profileBtn').addEventListener('click', () => {
+      profileCard.classList.toggle('hidden');
+    });
+
+    // Инициализация через 1 сек (имитация загрузки)
+    setTimeout(initApp, 1000);
+
+    // Обработка ошибок аватара
+    avatar.onerror = () => {
+      avatar.src = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+    };
+
+    // Отправка данных в бота
+    function sendData(data) {
+      if (tg) {
+        tg.sendData(JSON.stringify(data));
+      } else {
+        console.log('Отправлены данные:', data);
+      }
     }
   </script>
 </body>
