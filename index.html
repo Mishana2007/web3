@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web3 Игры и Подарки</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Экран загрузки */
+    .loading-screen {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #1a1a1a;
+      color: #fff;
+      transition: opacity 0.5s ease;
+    }
+
+    .gift-box {
+      width: 100px;
+      height: 100px;
+      background: url('https://via.placeholder.com/100?text=🎁') no-repeat center;
+      animation: bounce 1.5s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+
+    .hidden { display: none; }
+
+    /* Главная страница */
+    .main-page {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .content { flex-grow: 1; }
+
+    .bottom-menu {
+      display: flex;
+      justify-content: space-around;
+      padding: 10px;
+      background-color: #fff;
+      border-top: 1px solid #ccc;
+    }
+
+    .bottom-menu button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007aff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .bottom-menu button:hover { background-color: #005bb5; }
+
+    /* Профиль */
+    .profile-info {
+      padding: 20px;
+      background-color: #fff;
+      text-align: center;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .profile-info img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Экран загрузки -->
+  <div id="loading-screen" class="loading-screen">
+    <div class="gift-box"></div>
+    <p>Открываем подарки...</p>
+  </div>
+
+  <!-- Главная страница -->
+  <div id="main-page" class="main-page hidden">
+    <div id="profile-info" class="profile-info hidden"></div>
+    <div class="content">
+      <!-- Здесь будет контент главной страницы -->
+    </div>
+    <div class="bottom-menu">
+      <button id="contests-btn">Конкурсы</button>
+      <button id="profile-btn">Мой профиль</button>
+    </div>
+  </div>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script>
+    // Инициализация Telegram Web App
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+
+    // Элементы DOM
+    const loadingScreen = document.getElementById('loading-screen');
+    const mainPage = document.getElementById('main-page');
+    const profileInfo = document.getElementById('profile-info');
+    const contestsBtn = document.getElementById('contests-btn');
+    const profileBtn = document.getElementById('profile-btn');
+
+    // Анимация загрузки
+    setTimeout(() => {
+      loadingScreen.style.opacity = '0';
+      setTimeout(() => {
+        loadingScreen.classList.add('hidden');
+        mainPage.classList.remove('hidden');
+      }, 500);
+    }, 2000); // 2 секунды анимации
+
+    // Обработка кнопки "Мой профиль"
+    profileBtn.addEventListener('click', () => {
+      const user = tg.initDataUnsafe.user;
+      if (user) {
+        profileInfo.innerHTML = `
+          <img src="${user.photo_url || 'https://via.placeholder.com/50'}" alt="Аватар">
+          <h3>${user.username || 'Аноним'}</h3>
+        `;
+        profileInfo.classList.remove('hidden');
+      } else {
+        profileInfo.innerHTML = '<p>Данные профиля недоступны</p>';
+        profileInfo.classList.remove('hidden');
+      }
+    });
+
+    // Обработка кнопки "Конкурсы"
+    contestsBtn.addEventListener('click', () => {
+      profileInfo.classList.add('hidden');
+      // Здесь можно добавить логику для конкурсов
+    });
+  </script>
+</body>
+</html>
