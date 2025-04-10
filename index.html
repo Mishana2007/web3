@@ -46,7 +46,11 @@
       height: 100vh;
     }
 
-    .content { flex-grow: 1; }
+    .content { 
+      flex-grow: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
 
     .bottom-menu {
       display: flex;
@@ -54,6 +58,7 @@
       padding: 10px;
       background-color: #fff;
       border-top: 1px solid #ccc;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
     }
 
     .bottom-menu button {
@@ -62,25 +67,58 @@
       background-color: #007aff;
       color: #fff;
       border: none;
-      border-radius: 5px;
+      border-radius: 25px;
       cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 120px;
     }
 
-    .bottom-menu button:hover { background-color: #005bb5; }
+    .bottom-menu button:hover { 
+      background-color: #005bb5;
+      transform: translateY(-2px);
+    }
 
-    /* Профиль */
+    /* Стили профиля */
     .profile-info {
-      padding: 20px;
-      background-color: #fff;
+      padding: 25px;
+      background: #ffffff;
       text-align: center;
-      border-bottom: 1px solid #ccc;
+      border-bottom: 1px solid #eee;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     }
 
     .profile-info img {
-      width: 50px;
-      height: 50px;
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
+      object-fit: cover;
+      border: 3px solid #007aff;
+    }
+
+    .profile-info h3 {
+      margin: 0 0 5px 0;
+      font-size: 1.3em;
+      color: #1a1a1a;
+    }
+
+    .profile-info p {
+      margin: 0;
+      color: #666;
+      font-size: 0.95em;
+    }
+
+    /* Адаптивность */
+    @media (max-width: 480px) {
+      .bottom-menu button {
+        padding: 8px 15px;
+        font-size: 14px;
+        min-width: 100px;
+      }
+      
+      .profile-info {
+        padding: 15px;
+      }
     }
   </style>
 </head>
@@ -95,57 +133,94 @@
   <div id="main-page" class="main-page hidden">
     <div id="profile-info" class="profile-info hidden"></div>
     <div class="content">
-      <!-- Здесь будет контент главной страницы -->
+      <h2 style="color: #333; text-align: center;">Добро пожаловать!</h2>
     </div>
     <div class="bottom-menu">
       <button id="contests-btn">Конкурсы</button>
-      <button id="profile-btn">Мой профиль</button>
+      <button id="profile-btn">Профиль</button>
     </div>
   </div>
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
-    // Инициализация Telegram Web App
-    const tg = window.Telegram.WebApp;
-    tg.ready();
-    tg.expand();
+    // Проверка загрузки Telegram Web App SDK
+    if (!window.Telegram) {
+      console.error('Telegram Web App SDK не загружен!');
+      // Fallback для тестирования вне Telegram
+      window.Telegram = {
+        WebApp: {
+          ready: () => {},
+          expand: () => {},
+          initDataUnsafe: {
+            user: {
+              id: 12345,
+              first_name: "Тестовый",
+              username: "test_user",
+              photo_url: "https://via.placeholder.com/80"
+            }
+          }
+        }
+      };
+    }
 
-    // Элементы DOM
+    const tg = window.Telegram.WebApp;
     const loadingScreen = document.getElementById('loading-screen');
     const mainPage = document.getElementById('main-page');
     const profileInfo = document.getElementById('profile-info');
-    const contestsBtn = document.getElementById('contests-btn');
     const profileBtn = document.getElementById('profile-btn');
+    const contestsBtn = document.getElementById('contests-btn');
 
-    // Анимация загрузки
+    // Инициализация приложения
+    tg.ready();
+    tg.expand();
+
+    // Функция показа профиля
+    function showProfile() {
+      const user = tg.initDataUnsafe.user || {};
+      const fallbackAvatar = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+      
+      const profileHTML = `
+        <img src="${user.photo_url || fallbackAvatar}" 
+             onerror="this.onerror=null;this.src='${fallbackAvatar}'"
+             alt="Аватар">
+        <h3>${user.first_name || user.username || 'Гость'}</h3>
+        ${user.username ? `<p>@${user.username}</p>` : ''}
+      `;
+
+      profileInfo.innerHTML = profileHTML;
+      profileInfo.classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Обработчики событий
+    profileBtn.addEventListener('click', showProfile);
+    contestsBtn.addEventListener('click', () => {
+      profileInfo.classList.add('hidden');
+      // Дополнительная логика для конкурсов
+    });
+
+    // Имитация загрузки
     setTimeout(() => {
       loadingScreen.style.opacity = '0';
       setTimeout(() => {
         loadingScreen.classList.add('hidden');
         mainPage.classList.remove('hidden');
+        
+        // Автоматический показ профиля при наличии данных
+        if (tg.initDataUnsafe.user) {
+          showProfile();
+        }
       }, 500);
-    }, 2000); // 2 секунды анимации
+    }, 2000);
 
-    // Обработка кнопки "Мой профиль"
-    profileBtn.addEventListener('click', () => {
-      const user = tg.initDataUnsafe.user;
-      if (user) {
-        profileInfo.innerHTML = `
-          <img src="${user.photo_url || 'https://via.placeholder.com/50'}" alt="Аватар">
-          <h3>${user.username || 'Аноним'}</h3>
-        `;
-        profileInfo.classList.remove('hidden');
-      } else {
-        profileInfo.innerHTML = '<p>Данные профиля недоступны</p>';
-        profileInfo.classList.remove('hidden');
-      }
-    });
-
-    // Обработка кнопки "Конкурсы"
-    contestsBtn.addEventListener('click', () => {
-      profileInfo.classList.add('hidden');
-      // Здесь можно добавить логику для конкурсов
-    });
+    // Фолбэк для тестирования
+    if (window.location.search.includes('test')) {
+      window.Telegram.WebApp.initDataUnsafe.user = {
+        first_name: "Тестовый",
+        username: "test_user",
+        photo_url: "https://via.placeholder.com/80"
+      };
+    }
   </script>
 </body>
 </html>
